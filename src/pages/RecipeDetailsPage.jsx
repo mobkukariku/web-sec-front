@@ -72,7 +72,7 @@ export function RecipeDetailsPage() {
           <ErrorMessage message={error} />
           <button
             onClick={() => navigate('/')}
-            className="mt-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl font-semibold"
+            className="mt-4 bg-linear-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl font-semibold"
           >
             Вернуться на главную
           </button>
@@ -88,7 +88,7 @@ export function RecipeDetailsPage() {
           <p className="text-gray-600 text-xl font-medium mb-4">Рецепт не найден</p>
           <button
             onClick={() => navigate('/')}
-            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl font-semibold"
+            className="bg-linear-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl font-semibold"
           >
             Вернуться на главную
           </button>
@@ -101,7 +101,7 @@ export function RecipeDetailsPage() {
     <Container>
       <div className="max-w-3xl mx-auto mt-10 mb-12">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/dashboard')}
           className="mb-6 text-orange-600 hover:text-orange-700 flex items-center font-semibold transition-colors group"
         >
           <svg
@@ -122,16 +122,9 @@ export function RecipeDetailsPage() {
 
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-10 border border-orange-100">
           <div className="flex justify-between items-start mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent pr-4">
-              {recipe.name}
+            <h1 className="text-4xl font-bold bg-linear-to-r from-orange-600 to-red-600 bg-clip-text text-transparent pr-4">
+              {recipe.title}
             </h1>
-            <span
-              className={`px-4 py-2 rounded-full text-sm font-bold shadow-md ${getDifficultyColor(
-                recipe.difficulty
-              )}`}
-            >
-              {recipe.difficulty}/5
-            </span>
           </div>
 
           <div className="mb-8">
@@ -140,8 +133,8 @@ export function RecipeDetailsPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div className="bg-gradient-to-br from-orange-50 to-red-50 p-5 rounded-xl border border-orange-100">
+          <div className=" gap-4 mb-8">
+            <div className="bg-linear-to-br w-full from-orange-50 to-red-50 p-5 rounded-xl border border-orange-100">
               <div className="flex items-center text-orange-700">
                 <div className="bg-orange-100 p-2 rounded-lg mr-3">
                   <svg
@@ -160,7 +153,7 @@ export function RecipeDetailsPage() {
                 </div>
                 <div>
                   <span className="font-bold block">Время приготовления</span>
-                  <span className="text-sm">{recipe.cookingTime} минут</span>
+                  <span className="text-sm">{recipe.duration} минут</span>
                 </div>
               </div>
             </div>
@@ -200,7 +193,7 @@ export function RecipeDetailsPage() {
             <IngredientList ingredients={recipe.ingredients || []} />
           </div>
 
-          <div className="border-t border-gray-200 pt-6 text-sm text-gray-500">
+          <div className=" border-gray-200 pt-6 text-sm text-gray-500">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {recipe.createdAt && (
                 <div className="flex items-center">

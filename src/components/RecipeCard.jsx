@@ -1,28 +1,12 @@
 import { Link } from 'react-router-dom';
 
 export const RecipeCard = ({ recipe }) => {
-  const getDifficultyColor = (difficulty) => {
-    const colors = {
-      1: 'bg-gradient-to-r from-green-400 to-emerald-500 text-white',
-      2: 'bg-gradient-to-r from-blue-400 to-cyan-500 text-white',
-      3: 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white',
-      4: 'bg-gradient-to-r from-orange-400 to-red-500 text-white',
-      5: 'bg-gradient-to-r from-red-500 to-pink-600 text-white',
-    };
-    return colors[difficulty] || colors[1];
-  };
+
 
   return (
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-orange-100 hover:border-orange-300 hover:-translate-y-1">
       <div className="flex justify-between items-start mb-4">
-        <h3 className="text-2xl font-bold text-gray-800 pr-2">{recipe.name}</h3>
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-bold shadow-md ${getDifficultyColor(
-            recipe.difficulty
-          )}`}
-        >
-          {recipe.difficulty}/5
-        </span>
+        <h3 className="text-2xl font-bold text-gray-800 pr-2">{recipe.title}</h3>
       </div>
       
       <p className="text-gray-600 mb-5 line-clamp-2 leading-relaxed">{recipe.description}</p>
@@ -42,12 +26,12 @@ export const RecipeCard = ({ recipe }) => {
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span>{recipe.cookingTime} мин</span>
+          <span>{recipe.duration} мин</span>
         </div>
         
         <Link
           to={`/recipes/${recipe.id}`}
-          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-5 py-2 rounded-lg transition-all font-semibold shadow-md hover:shadow-lg transform hover:scale-105"
+          className="bg-linear-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-5 py-2 rounded-lg transition-all font-semibold shadow-md hover:shadow-lg transform hover:scale-105"
         >
           Посмотреть
         </Link>

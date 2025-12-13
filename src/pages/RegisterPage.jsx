@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { Container } from '../components/Container';
 import { ErrorMessage } from '../components/ErrorMessage';
 
@@ -10,47 +9,12 @@ export function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
   const navigate = useNavigate();
 
   const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-
-    if (!email || !password || !confirmPassword) {
-      setError('Пожалуйста, заполните все поля');
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setError('Пожалуйста, введите корректный email');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Пароль должен содержать минимум 6 символов');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Пароли не совпадают');
-      return;
-    }
-
-    setLoading(true);
-    const result = await register(email, password);
-    setLoading(false);
-
-    if (result.success) {
-      navigate('/');
-    } else {
-      setError(result.error || 'Ошибка регистрации');
-    }
-  };
 
   return (
     <Container>

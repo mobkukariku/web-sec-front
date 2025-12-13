@@ -18,7 +18,7 @@ export const IngredientList = ({ ingredients }) => {
         </svg>
         Ингредиенты
       </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="flex flex-col gap-3">
         {ingredients.map((ingredient, index) => (
           <div
             key={index}
@@ -26,9 +26,7 @@ export const IngredientList = ({ ingredients }) => {
           >
             <div className="w-2 h-2 bg-gradient-to-r from-orange-400 to-red-500 rounded-full mr-3"></div>
             <span className="text-gray-700 font-medium">
-              {typeof ingredient === 'object' && ingredient.name
-                ? ingredient.name
-                : ingredient}
+                {ingredient.name} - {ingredient.amount} грамм
             </span>
           </div>
         ))}
