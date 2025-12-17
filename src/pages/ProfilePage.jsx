@@ -28,7 +28,7 @@ export function ProfilePage() {
     try {
       setLoadingProfile(true);
       setError('');
-      const profile = await profileAPI.getProfile(userId);
+      const profile = await profileAPI.getMyProfile();
       setName(profile.name || '');
       setEmail(profile.email || '');
     } catch (err) {
@@ -74,7 +74,7 @@ export function ProfilePage() {
         updateData.password = password;
       }
 
-      await profileAPI.updateProfile(userId, updateData);
+      await profileAPI.updateMyProfile(updateData);
       setSuccess('Профиль успешно обновлен!');
       setPassword('');
       setConfirmPassword('');
@@ -247,5 +247,6 @@ export function ProfilePage() {
     </Container>
   );
 }
+
 
 

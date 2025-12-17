@@ -23,14 +23,17 @@ export function LoginPage() {
     }
 
     setLoading(true);
-    const result = await login(email, password);
-    setLoading(false);
-
-
-    if (result.userId) {
-      navigate('/dashboard');
-    } else {
-      setError(result.error || 'Ошибка входа');
+    try {
+      const result = await login(email, password);
+      if (result && result.userId) {
+        navigate('/dashboard');
+      } else {
+        setError(result?.error || 'Ошибка входа');
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || err.message || 'Ошибка входа');
+    } finally {
+      setLoading(false);
     }
   };
 

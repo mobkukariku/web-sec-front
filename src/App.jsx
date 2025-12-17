@@ -5,7 +5,10 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { CreateRecipePage } from './pages/CreateRecipePage';
-import {RecipeDetailsPage} from "./pages/RecipeDetailsPage.jsx";
+import { RecipeDetailsPage } from "./pages/RecipeDetailsPage.jsx";
+import { MyRecipesPage } from './pages/MyRecipesPage';
+import { ProfilePage } from './pages/ProfilePage';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -19,12 +22,32 @@ function App() {
                   element={<DashboardPage />}
               />
               <Route
-                  path="/create-recipe"
-                  element={<CreateRecipePage />}
-              />
-              <Route
                   path="/recipes/:id"
                   element={<RecipeDetailsPage />}
+              />
+              <Route
+                  path="/create-recipe"
+                  element={
+                      <ProtectedRoute>
+                          <CreateRecipePage />
+                      </ProtectedRoute>
+                  }
+              />
+              <Route
+                  path="/my-recipes"
+                  element={
+                      <ProtectedRoute>
+                          <MyRecipesPage />
+                      </ProtectedRoute>
+                  }
+              />
+              <Route
+                  path="/profile"
+                  element={
+                      <ProtectedRoute>
+                          <ProfilePage />
+                      </ProtectedRoute>
+                  }
               />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>

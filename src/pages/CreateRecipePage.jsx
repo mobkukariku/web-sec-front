@@ -116,7 +116,6 @@ export function CreateRecipePage() {
         title,
         description,
         duration: durationNum,
-        author_id: userId,
         ingredients: ingredientsWithAmounts,
       });
       setSuccess('Рецепт успешно создан!');

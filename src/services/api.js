@@ -9,6 +9,36 @@ const api = axios.create({
   },
 });
 
+// Interceptor для добавления токена к каждому запросу
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor для обработки ошибок авторизации
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      // Токен невалидный или истек
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      // Перенаправляем на страницу входа, если не на ней
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const authAPI = {
   login: async (email, password) => {
@@ -30,8 +60,8 @@ export const recipesAPI = {
     const response = await api.get(`/recipes/${id}`);
     return response.data;
   },
-  getMyRecipes: async (userId) => {
-    const response = await api.get(`/my-recipes/${userId}`);
+  getMyRecipes: async () => {
+    const response = await api.get('/recipes/my-recipes/me');
     return response.data;
   },
   create: async (recipeData) => {
@@ -52,6 +82,14 @@ export const ingredientsAPI = {
 };
 
 export const profileAPI = {
+  getMyProfile: async () => {
+    const response = await api.get('/profile/me');
+    return response.data;
+  },
+  updateMyProfile: async (profileData) => {
+    const response = await api.put('/profile/me', profileData);
+    return response.data;
+  },
   getProfile: async (userId) => {
     const response = await api.get(`/profile/${userId}`);
     return response.data;

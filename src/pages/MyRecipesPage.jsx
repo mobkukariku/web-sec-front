@@ -22,7 +22,7 @@ export function MyRecipesPage() {
     try {
       setLoading(true);
       setError('');
-      const data = await recipesAPI.getMyRecipes(userId);
+      const data = await recipesAPI.getMyRecipes();
       setRecipes(Array.isArray(data) ? data : data.recipes || []);
     } catch (err) {
       setError(
@@ -99,5 +99,6 @@ export function MyRecipesPage() {
     </Container>
   );
 }
+
 
 

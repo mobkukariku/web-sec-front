@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {useAuth} from "../context/AuthContext.jsx";
 
 export const Navbar = () => {
-  const { userId, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const handleLogout = () => {
     logout();
@@ -14,7 +14,7 @@ export const Navbar = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link
-            to="/"
+            to="/dashboard"
             className="text-2xl font-bold hover:text-yellow-200 transition-colors flex items-center gap-2"
           >
             <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
@@ -25,7 +25,7 @@ export const Navbar = () => {
           </Link>
 
           <div className="flex items-center gap-4">
-            {userId ? (
+            {isAuthenticated ? (
               <>
                 <Link
                   to="/"
