@@ -14,7 +14,7 @@ export const Navbar = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link
-            to="/dashboard"
+            to="/"
             className="text-2xl font-bold hover:text-yellow-200 transition-colors flex items-center gap-2"
           >
             <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
@@ -28,10 +28,28 @@ export const Navbar = () => {
             {userId ? (
               <>
                 <Link
-                  to="/dashboard"
+                  to="/"
                   className="hover:text-yellow-200 transition-colors font-medium px-3 py-1 rounded-lg hover:bg-white/10"
                 >
                   Главная
+                </Link>
+                <Link
+                  to="/create-recipe"
+                  className="hover:text-yellow-200 transition-colors font-medium px-3 py-1 rounded-lg hover:bg-white/10"
+                >
+                  Создать рецепт
+                </Link>
+                <Link
+                  to="/my-recipes"
+                  className="hover:text-yellow-200 transition-colors font-medium px-3 py-1 rounded-lg hover:bg-white/10"
+                >
+                  Мои рецепты
+                </Link>
+                <Link
+                  to="/profile"
+                  className="hover:text-yellow-200 transition-colors font-medium px-3 py-1 rounded-lg hover:bg-white/10"
+                >
+                  Профиль
                 </Link>
                 <button
                   onClick={handleLogout}

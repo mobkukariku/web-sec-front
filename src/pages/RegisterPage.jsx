@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Container } from '../components/Container';
 import { ErrorMessage } from '../components/ErrorMessage';
+import {useAuth} from "../context/AuthContext.jsx";
 
 export function RegisterPage() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -11,9 +13,35 @@ export function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+  const { register } = useAuth();
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+
+    if (!name || !email || !password || !confirmPassword) {
+      setError('Пожалуйста, заполните все поля');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await register(name, email, password);
+      if(result && result.userId) {
+        navigate('/dashboard');
+      } else {
+        setError(result?.error || 'Ошибка регистрации');
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || err.message || 'Ошибка регистрации');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
 
 
   return (
@@ -26,7 +54,7 @@ export function RegisterPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold bg-linear-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
               Создать аккаунт
             </h2>
             <p className="text-gray-500 mt-2">Присоединяйтесь к нам!</p>
@@ -34,13 +62,31 @@ export function RegisterPage() {
 
           <ErrorMessage message={error} onClose={() => setError('')} />
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form  onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-semibold text-gray-700 mb-2"
+              >
+                Имя *
+              </label>
+              <input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                placeholder="Ваше имя"
+                disabled={loading}
+              />
+            </div>
+
             <div>
               <label
                 htmlFor="email"
                 className="block text-sm font-semibold text-gray-700 mb-2"
               >
-                Email
+                Email *
               </label>
               <input
                 id="email"
@@ -58,7 +104,7 @@ export function RegisterPage() {
                 htmlFor="password"
                 className="block text-sm font-semibold text-gray-700 mb-2"
               >
-                Пароль
+                Пароль *
               </label>
               <input
                 id="password"
@@ -76,7 +122,7 @@ export function RegisterPage() {
                 htmlFor="confirmPassword"
                 className="block text-sm font-semibold text-gray-700 mb-2"
               >
-                Подтвердите пароль
+                Подтвердите пароль *
               </label>
               <input
                 id="confirmPassword"

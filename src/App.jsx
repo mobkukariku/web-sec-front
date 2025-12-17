@@ -26,7 +26,7 @@ function App() {
                   path="/recipes/:id"
                   element={<RecipeDetailsPage />}
               />
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
       </div>
   );

@@ -4,19 +4,20 @@ import { recipesAPI, ingredientsAPI } from '../services/api';
 import { Container } from '../components/Container';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { SuccessMessage } from '../components/SuccessMessage';
+import { useAuth } from '../context/AuthContext';
 
 export function CreateRecipePage() {
-  const [name, setName] = useState('');
+  const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [cookingTime, setCookingTime] = useState('');
-  const [difficulty, setDifficulty] = useState('1');
+  const [duration, setDuration] = useState('');
   const [ingredients, setIngredients] = useState([]);
-  const [selectedIngredients, setSelectedIngredients] = useState([]);
+  const [selectedIngredients, setSelectedIngredients] = useState([]); // массив объектов {id, amount}
   const [loading, setLoading] = useState(false);
   const [loadingIngredients, setLoadingIngredients] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+  const { userId } = useAuth();
 
   useEffect(() => {
     loadIngredients();
@@ -36,14 +37,36 @@ export function CreateRecipePage() {
     }
   };
 
-  const handleIngredientChange = (ingredientId) => {
-    setSelectedIngredients((prev) => {
-      if (prev.includes(ingredientId)) {
-        return prev.filter((id) => id !== ingredientId);
-      } else {
-        return [...prev, ingredientId];
-      }
-    });
+  const handleIngredientChange = (ingredientId, checked) => {
+    if (checked) {
+      setSelectedIngredients((prev) => {
+        if (!prev.find(item => item.id === ingredientId)) {
+          return [...prev, { id: ingredientId, amount: '' }];
+        }
+        return prev;
+      });
+    } else {
+      setSelectedIngredients((prev) => 
+        prev.filter((item) => item.id !== ingredientId)
+      );
+    }
+  };
+
+  const handleAmountChange = (ingredientId, amount) => {
+    setSelectedIngredients((prev) =>
+      prev.map((item) =>
+        item.id === ingredientId ? { ...item, amount } : item
+      )
+    );
+  };
+
+  const getIngredientAmount = (ingredientId) => {
+    const item = selectedIngredients.find(item => item.id === ingredientId);
+    return item ? item.amount : '';
+  };
+
+  const isIngredientSelected = (ingredientId) => {
+    return selectedIngredients.some(item => item.id === ingredientId);
   };
 
   const handleSubmit = async (e) => {
@@ -51,8 +74,13 @@ export function CreateRecipePage() {
     setError('');
     setSuccess('');
 
-    if (!name || !description || !cookingTime || !difficulty) {
+    if (!title || !description || !duration) {
       setError('Пожалуйста, заполните все поля');
+      return;
+    }
+
+    if (!userId) {
+      setError('Необходимо войти в систему');
       return;
     }
 
@@ -61,8 +89,23 @@ export function CreateRecipePage() {
       return;
     }
 
-    const cookingTimeNum = parseInt(cookingTime, 10);
-    if (isNaN(cookingTimeNum) || cookingTimeNum <= 0) {
+    // Проверяем, что для всех ингредиентов указано количество
+    const ingredientsWithAmounts = selectedIngredients.map(item => ({
+      id: item.id,
+      amount: parseInt(item.amount, 10)
+    }));
+
+    const hasInvalidAmount = ingredientsWithAmounts.some(item => 
+      isNaN(item.amount) || item.amount <= 0
+    );
+
+    if (hasInvalidAmount) {
+      setError('Пожалуйста, укажите корректное количество для всех ингредиентов');
+      return;
+    }
+
+    const durationNum = parseInt(duration, 10);
+    if (isNaN(durationNum) || durationNum <= 0) {
       setError('Время приготовления должно быть положительным числом');
       return;
     }
@@ -70,19 +113,19 @@ export function CreateRecipePage() {
     setLoading(true);
     try {
       await recipesAPI.create({
-        name,
+        title,
         description,
-        cookingTime: cookingTimeNum,
-        difficulty: parseInt(difficulty, 10),
-        ingredientIds: selectedIngredients,
+        duration: durationNum,
+        author_id: userId,
+        ingredients: ingredientsWithAmounts,
       });
       setSuccess('Рецепт успешно создан!');
       setTimeout(() => {
-        navigate('/');
+        navigate('/dashboard');
       }, 1500);
     } catch (err) {
       setError(
-        err.response?.data?.message || 'Ошибка при создании рецепта'
+        err.response?.data?.error || err.response?.data?.message || 'Ошибка при создании рецепта'
       );
     } finally {
       setLoading(false);
@@ -111,16 +154,16 @@ export function CreateRecipePage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
-                htmlFor="name"
+                htmlFor="title"
                 className="block text-sm font-semibold text-gray-700 mb-2"
               >
                 Название рецепта *
               </label>
               <input
-                id="name"
+                id="title"
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
                 placeholder="Название рецепта"
                 disabled={loading}
@@ -145,47 +188,23 @@ export function CreateRecipePage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="cookingTime"
-                  className="block text-sm font-semibold text-gray-700 mb-2"
-                >
-                  Время приготовления (мин) *
-                </label>
-                <input
-                  id="cookingTime"
-                  type="number"
-                  value={cookingTime}
-                  onChange={(e) => setCookingTime(e.target.value)}
-                  min="1"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
-                  placeholder="30"
-                  disabled={loading}
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="difficulty"
-                  className="block text-sm font-semibold text-gray-700 mb-2"
-                >
-                  Сложность (1-5) *
-                </label>
-                <select
-                  id="difficulty"
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none bg-white"
-                  disabled={loading}
-                >
-                  <option value="1">1 - Очень легко</option>
-                  <option value="2">2 - Легко</option>
-                  <option value="3">3 - Средне</option>
-                  <option value="4">4 - Сложно</option>
-                  <option value="5">5 - Очень сложно</option>
-                </select>
-              </div>
+            <div>
+              <label
+                htmlFor="duration"
+                className="block text-sm font-semibold text-gray-700 mb-2"
+              >
+                Время приготовления (мин) *
+              </label>
+              <input
+                id="duration"
+                type="number"
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                min="1"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none"
+                placeholder="30"
+                disabled={loading}
+              />
             </div>
 
             <div>
@@ -202,25 +221,50 @@ export function CreateRecipePage() {
                   <p className="text-gray-500">Ингредиенты не найдены</p>
                 </div>
               ) : (
-                <div className="border-2 border-gray-200 rounded-xl p-4 max-h-60 overflow-y-auto bg-gray-50">
-                  <div className="space-y-2">
-                    {ingredients.map((ingredient) => (
-                      <label
-                        key={ingredient.id}
-                        className="flex items-center space-x-3 cursor-pointer hover:bg-white p-3 rounded-lg transition-colors"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedIngredients.includes(ingredient.id)}
-                          onChange={() => handleIngredientChange(ingredient.id)}
-                          className="w-5 h-5 text-orange-600 focus:ring-orange-500 border-gray-300 rounded focus:ring-2"
-                          disabled={loading}
-                        />
-                        <span className="text-gray-700 font-medium">
-                          {ingredient.name}
-                        </span>
-                      </label>
-                    ))}
+                <div className="border-2 border-gray-200 rounded-xl p-4 max-h-96 overflow-y-auto bg-gray-50">
+                  <div className="space-y-3">
+                    {ingredients.map((ingredient) => {
+                      const isSelected = isIngredientSelected(ingredient.id);
+                      const amount = getIngredientAmount(ingredient.id);
+                      
+                      return (
+                        <div
+                          key={ingredient.id}
+                          className={`p-3 rounded-lg transition-all ${
+                            isSelected ? 'bg-white border-2 border-orange-300' : 'border-2 border-transparent hover:bg-white'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3 mb-2">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => handleIngredientChange(ingredient.id, e.target.checked)}
+                              className="w-5 h-5 text-orange-600 focus:ring-orange-500 border-gray-300 rounded focus:ring-2"
+                              disabled={loading}
+                            />
+                            <span className="text-gray-700 font-medium flex-1">
+                              {ingredient.name}
+                            </span>
+                          </div>
+                          {isSelected && (
+                            <div className="mt-2 ml-8">
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Количество (грамм) *
+                              </label>
+                              <input
+                                type="number"
+                                value={amount}
+                                onChange={(e) => handleAmountChange(ingredient.id, e.target.value)}
+                                min="1"
+                                placeholder="100"
+                                className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all outline-none text-sm"
+                                disabled={loading}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -249,7 +293,7 @@ export function CreateRecipePage() {
               </button>
               <button
                 type="button"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/dashboard')}
                 disabled={loading}
                 className="px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 font-semibold"
               >
